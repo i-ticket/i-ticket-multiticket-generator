@@ -1,0 +1,76 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: pretix-i-ticket-multiticket-generator\n"
+"Language: de_Informal\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Multi Ticket(s) erstellen"
+msgstr "Multi Ticket(s) erstellen"
+
+msgid "Create multiple tickets/orders in one step"
+msgstr "Mehrere Tickets/Bestellungen in einem Schritt erstellen"
+
+msgid "Eigene Bestellung"
+msgstr "Eigene Bestellung"
+
+msgid "Wenn aktiv, wird jede Zeile als eigene Bestellung erstellt."
+msgstr "Wenn aktiv, wird jede Zeile als eigene Bestellung erstellt."
+
+msgid "Ticket-Zeilen"
+msgstr "Ticket-Zeilen"
+
+msgid "Zeile entfernen"
+msgstr "Zeile entfernen"
+
+msgid "+ Ticket hinzufügen"
+msgstr "+ Ticket hinzufügen"
+
+msgid "Personalisiert"
+msgstr "Personalisiert"
+
+msgid "Freikarte"
+msgstr "Freikarte"
+
+msgid "Vorname"
+msgstr "Vorname"
+
+msgid "Nachname"
+msgstr "Nachname"
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "Bestell-E-Mail"
+msgstr "Bestell-E-Mail"
+
+msgid "Bitte E-Mail in einer personalisierten Ticket-Zeile eintragen."
+msgstr "Bitte E-Mail in einer personalisierten Ticket-Zeile eintragen."
+
+msgid "Bei 'Eigene Bestellung' ist E-Mail pro Zeile Pflicht."
+msgstr "Bei 'Eigene Bestellung' ist E-Mail pro Zeile Pflicht."
+
+msgid "E-Mail ist bei personalisiert Pflicht."
+msgstr "E-Mail ist bei personalisiert Pflicht."
+
+msgid "In Zeile 1 ist E-Mail Pflicht."
+msgstr "In Zeile 1 ist E-Mail Pflicht."
+
+msgid "Vorname ist bei personalisiert Pflicht."
+msgstr "Vorname ist bei personalisiert Pflicht."
+
+msgid "Nachname ist bei personalisiert Pflicht."
+msgstr "Nachname ist bei personalisiert Pflicht."
+
+msgid "Firma"
+msgstr "Firma"
+
+msgid "Bitte mindestens eine Ticket-Zeile anlegen."
+msgstr "Bitte mindestens eine Ticket-Zeile anlegen."
+
+msgid "Es gab ein Problem bei der Erstellung der Bestellung: %(error)s"
+msgstr "Es gab ein Problem bei der Erstellung der Bestellung: %(error)s"
+
+msgid "Erfolgreich erstellt: %(orders)s Bestellung(en), %(tickets)s Ticket(s)."
+msgstr "Erfolgreich erstellt: %(orders)s Bestellung(en), %(tickets)s Ticket(s)."

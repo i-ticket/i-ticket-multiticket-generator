@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 from pretix_i_ticket_multiticket_generator import __version__
 
 setup(
-    name="pretix-i-ticket-multiticket-generator",
+    name="pretix_i-ticket_multi_ticket_generator",
     version=__version__,
     description="Multi ticket generator (i-ticket)",
     author="i-ticket",

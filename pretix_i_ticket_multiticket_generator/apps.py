@@ -11,10 +11,10 @@ except ImportError:
 class PluginApp(PluginConfig):
     default = True
     name = "pretix_i_ticket_multiticket_generator"
-    verbose_name = "Multi Tickets Generator"
+    verbose_name = "i-ticket Multiticket Generator"
 
     class PretixPluginMeta:
-        name = gettext_lazy("Multi Tickets Generator")
+        name = gettext_lazy("i-ticket Multiticket Generator")
         author = "i-ticket"
         description = gettext_lazy("Create multiple tickets/orders in one step")
         visible = True

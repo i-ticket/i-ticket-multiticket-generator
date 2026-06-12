@@ -5,6 +5,53 @@
 {% load bootstrap3 %}
 
 {% block inside %}
+    <style>
+        .mtg-individual-names,
+        .mtg-same-name-fields {
+            margin-top: 16px;
+            margin-bottom: 20px;
+        }
+        .mtg-individual-name-row {
+            margin-bottom: 14px;
+        }
+        .mtg-individual-name-row:last-child {
+            margin-bottom: 0;
+        }
+        .mtg-ticket-heading {
+            margin-bottom: 0;
+        }
+        .mtg-ticket-heading .control-label {
+            font-weight: 600;
+            padding-top: 0;
+            margin-bottom: 0;
+            text-align: right;
+        }
+        .mtg-name-pair {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        .mtg-name-pair-row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        .mtg-name-pair-row > [class*="col-"] {
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+        .mtg-name-pair-row > [class*="col-"]:first-child {
+            padding-left: 0;
+        }
+        .mtg-name-pair-row .control-label {
+            display: block;
+            font-weight: normal;
+            font-size: 13px;
+            margin-bottom: 4px;
+            text-align: left;
+        }
+        .mtg-name-pair-row .form-control {
+            width: 100%;
+        }
+    </style>
     <h2>{% trans "Multi Ticket(s) erstellen" %}</h2>
     <form action="" method="post" class="form-horizontal" enctype="multipart/form-data">
         {% csrf_token %}
@@ -27,9 +74,29 @@
                     {% endif %}
                     {% bootstrap_field rowform.ticket_count layout="horizontal" %}
                     {% bootstrap_field rowform.personalized layout="horizontal" %}
+                    <div class="mtg-name-mode-group" style="display:none;">
+                        {% bootstrap_field rowform.name_mode layout="horizontal" %}
+                    </div>
+                    <div class="mtg-same-name-fields" style="display:none;">
+                        <div class="form-group mtg-name-pair">
+                            <label class="col-md-3 control-label"></label>
+                            <div class="col-md-9">
+                                <div class="row mtg-name-pair-row">
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="{{ rowform.attendee_first_name.id_for_label }}">{% trans "Vorname" %}</label>
+                                        {{ rowform.attendee_first_name }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="{{ rowform.attendee_last_name.id_for_label }}">{% trans "Nachname" %}</label>
+                                        {{ rowform.attendee_last_name }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mtg-individual-names" style="display:none;"></div>
+                    {{ rowform.attendee_names_json }}
                     {% bootstrap_field rowform.attendee_email layout="horizontal" %}
-                    {% bootstrap_field rowform.attendee_first_name layout="horizontal" %}
-                    {% bootstrap_field rowform.attendee_last_name layout="horizontal" %}
                     {% if rowform.attendee_company %}
                         {% bootstrap_field rowform.attendee_company layout="horizontal" %}
                     {% endif %}
@@ -55,9 +122,29 @@
                     {% endif %}
                     {% bootstrap_field row_formset.empty_form.ticket_count layout="horizontal" %}
                     {% bootstrap_field row_formset.empty_form.personalized layout="horizontal" %}
+                    <div class="mtg-name-mode-group" style="display:none;">
+                        {% bootstrap_field row_formset.empty_form.name_mode layout="horizontal" %}
+                    </div>
+                    <div class="mtg-same-name-fields" style="display:none;">
+                        <div class="form-group mtg-name-pair">
+                            <label class="col-md-3 control-label"></label>
+                            <div class="col-md-9">
+                                <div class="row mtg-name-pair-row">
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="{{ row_formset.empty_form.attendee_first_name.id_for_label }}">{% trans "Vorname" %}</label>
+                                        {{ row_formset.empty_form.attendee_first_name }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="control-label" for="{{ row_formset.empty_form.attendee_last_name.id_for_label }}">{% trans "Nachname" %}</label>
+                                        {{ row_formset.empty_form.attendee_last_name }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mtg-individual-names" style="display:none;"></div>
+                    {{ row_formset.empty_form.attendee_names_json }}
                     {% bootstrap_field row_formset.empty_form.attendee_email layout="horizontal" %}
-                    {% bootstrap_field row_formset.empty_form.attendee_first_name layout="horizontal" %}
-                    {% bootstrap_field row_formset.empty_form.attendee_last_name layout="horizontal" %}
                     {% if row_formset.empty_form.attendee_company %}
                         {% bootstrap_field row_formset.empty_form.attendee_company layout="horizontal" %}
                     {% endif %}

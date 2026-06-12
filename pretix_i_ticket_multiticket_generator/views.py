@@ -162,14 +162,15 @@ class IndexView(FormView):
             product = row.get("product")
             subevent = row.get("ticket_date")
             personalized = row.get("personalized")
+            name_mode = row.get("name_mode") or "same"
             attendee_email = row.get("attendee_email")
             attendee_first_name = (row.get("attendee_first_name") or "").strip()
             attendee_last_name = (row.get("attendee_last_name") or "").strip()
             attendee_company = (row.get("attendee_company") or "").strip()
-            full_name = f"{attendee_first_name} {attendee_last_name}".strip()
+            attendee_names = row.get("attendee_names") or []
             free_ticket = row.get("free_ticket")
 
-            for _ in range(ticket_count):
+            for ticket_idx in range(ticket_count):
                 position = {
                     "positionid": position_id,
                     "item": product.id,
@@ -179,6 +180,13 @@ class IndexView(FormView):
                     "subevent": subevent.id if subevent else None,
                 }
                 if personalized:
+                    if name_mode == "individual" and attendee_names:
+                        name_entry = attendee_names[ticket_idx]
+                        full_name = (
+                            f"{name_entry['first_name']} {name_entry['last_name']}"
+                        ).strip()
+                    else:
+                        full_name = f"{attendee_first_name} {attendee_last_name}".strip()
                     position["attendee_name"] = full_name
                     if attendee_company:
                         position["company"] = attendee_company

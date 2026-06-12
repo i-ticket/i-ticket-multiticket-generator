@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 from django.db.models import Q
 from django.forms import formset_factory
@@ -45,10 +47,30 @@ class MultiTicketRowForm(forms.Form):
         empty_label=_("All dates"),
     )
     ticket_count = forms.IntegerField(label=_("Ticket count"), min_value=1, initial=1)
-    personalized = forms.BooleanField(required=False, label=_("Personalisiert"))
+    personalized = forms.ChoiceField(
+        required=False,
+        label=_("Personalisiert"),
+        choices=(
+            ("no", _("Nein")),
+            ("yes", _("Ja")),
+        ),
+        initial="no",
+        widget=forms.RadioSelect,
+    )
+    name_mode = forms.ChoiceField(
+        required=False,
+        label=_("Namensvergabe"),
+        choices=(
+            ("same", _("Alle auf gleichen Namen")),
+            ("individual", _("Individuelle Namen")),
+        ),
+        initial="same",
+        widget=forms.RadioSelect,
+    )
     attendee_email = forms.EmailField(required=False, label=_("E-Mail"))
     attendee_first_name = forms.CharField(required=False, label=_("Vorname"))
     attendee_last_name = forms.CharField(required=False, label=_("Nachname"))
+    attendee_names_json = forms.CharField(required=False, widget=forms.HiddenInput)
     attendee_company = forms.CharField(required=False, label=_("Firma"))
     free_ticket = forms.BooleanField(required=False, label=_("Freikarte"))
 
@@ -113,12 +135,25 @@ class MultiTicketRowForm(forms.Form):
         self.fields["category"].queryset = event.categories.all()
         self.fields["product"].queryset = products
         self.fields["ticket_date"].queryset = event.subevents.all()
+        for field_name in ("attendee_first_name", "attendee_last_name"):
+            self.fields[field_name].widget.attrs.setdefault("class", "form-control")
         if not event.settings.attendee_company_asked:
             self.fields.pop("attendee_company")
 
     def clean(self):
         cleaned = super().clean()
-        if cleaned.get("personalized"):
+        personalized = cleaned.get("personalized") == "yes"
+        cleaned["personalized"] = personalized
+
+        if not personalized:
+            cleaned["name_mode"] = "same"
+            cleaned["attendee_names"] = []
+            return cleaned
+
+        name_mode = cleaned.get("name_mode") or "same"
+        ticket_count = cleaned.get("ticket_count") or 1
+
+        if name_mode == "same":
             if not cleaned.get("attendee_first_name"):
                 self.add_error(
                     "attendee_first_name", _("Vorname ist bei personalisiert Pflicht.")
@@ -127,6 +162,62 @@ class MultiTicketRowForm(forms.Form):
                 self.add_error(
                     "attendee_last_name", _("Nachname ist bei personalisiert Pflicht.")
                 )
+            cleaned["attendee_names"] = []
+            return cleaned
+
+        raw_json = (cleaned.get("attendee_names_json") or "").strip()
+        if not raw_json:
+            self.add_error(
+                "attendee_names_json",
+                _("Bitte für jedes Ticket Vor- und Nachname eintragen."),
+            )
+            return cleaned
+
+        try:
+            names = json.loads(raw_json)
+        except (TypeError, ValueError):
+            self.add_error(
+                "attendee_names_json",
+                _("Ungültige Namensdaten."),
+            )
+            return cleaned
+
+        if not isinstance(names, list) or len(names) != ticket_count:
+            self.add_error(
+                "attendee_names_json",
+                _("Bitte genau %(count)s Namenspaare eintragen.")
+                % {"count": ticket_count},
+            )
+            return cleaned
+
+        validated_names = []
+        for idx, entry in enumerate(names, start=1):
+            if not isinstance(entry, dict):
+                self.add_error(
+                    "attendee_names_json",
+                    _("Ungültige Namensdaten in Zeile %(row)s.")
+                    % {"row": idx},
+                )
+                return cleaned
+            first_name = (entry.get("first_name") or "").strip()
+            last_name = (entry.get("last_name") or "").strip()
+            if not first_name:
+                self.add_error(
+                    "attendee_names_json",
+                    _("Vorname für Ticket %(num)s ist Pflicht.") % {"num": idx},
+                )
+                return cleaned
+            if not last_name:
+                self.add_error(
+                    "attendee_names_json",
+                    _("Nachname für Ticket %(num)s ist Pflicht.") % {"num": idx},
+                )
+                return cleaned
+            validated_names.append(
+                {"first_name": first_name, "last_name": last_name}
+            )
+
+        cleaned["attendee_names"] = validated_names
         return cleaned
 
 

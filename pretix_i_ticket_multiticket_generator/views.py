@@ -14,6 +14,7 @@ from rest_framework.exceptions import ValidationError
 from pretix.api.serializers.order import OrderCreateSerializer
 from pretix.base.i18n import language
 from pretix.base.models import Item, Order, TaxRule
+from pretix.base.settings import PERSON_NAME_SCHEMES
 from pretix.base.services.invoices import generate_invoice, invoice_qualified
 from pretix.base.services.orders import _order_placed_email, _order_placed_email_attendee
 from pretix.base.signals import order_paid, order_placed
@@ -146,6 +147,24 @@ class IndexView(FormView):
         )
         return redirect(self.get_success_url())
 
+    def _attendee_name_parts(self, first_name, last_name):
+        first_name = (first_name or "").strip()
+        last_name = (last_name or "").strip()
+        scheme_name = self.request.event.settings.name_scheme
+        scheme = PERSON_NAME_SCHEMES.get(scheme_name, PERSON_NAME_SCHEMES["given_family"])
+        asked_keys = [k for (k, _label, _width) in scheme["fields"]]
+
+        parts = {"_scheme": scheme_name}
+        if "given_name" in asked_keys:
+            parts["given_name"] = first_name
+        if "family_name" in asked_keys:
+            parts["family_name"] = last_name
+        if "full_name" in asked_keys and "given_name" not in asked_keys:
+            parts["full_name"] = f"{first_name} {last_name}".strip()
+        if "calling_name" in asked_keys:
+            parts["calling_name"] = first_name
+        return parts
+
     def _build_order_payload(self, rows, order_comment="", contact_email=""):
         order_positions = []
         position_id = 1
@@ -182,12 +201,14 @@ class IndexView(FormView):
                 if personalized:
                     if name_mode == "individual" and attendee_names:
                         name_entry = attendee_names[ticket_idx]
-                        full_name = (
-                            f"{name_entry['first_name']} {name_entry['last_name']}"
-                        ).strip()
+                        first_name = (name_entry.get("first_name") or "").strip()
+                        last_name = (name_entry.get("last_name") or "").strip()
                     else:
-                        full_name = f"{attendee_first_name} {attendee_last_name}".strip()
-                    position["attendee_name"] = full_name
+                        first_name = attendee_first_name
+                        last_name = attendee_last_name
+                    position["attendee_name_parts"] = self._attendee_name_parts(
+                        first_name, last_name
+                    )
                     if attendee_company:
                         position["company"] = attendee_company
                 if attendee_email:
